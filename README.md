@@ -1,6 +1,6 @@
 # Chloroplast Tree Of Life Pipeline
 
-Here we describe the pipeline used to produce the chloroplast tree from Leempoel et al 2022.
+Here we describe the pipeline used to produce the chloroplast tree from Leempoel *et al.* 2022. The pipeline was used both for the pre-tree and the final tree.
 
 ## Input
 
@@ -10,20 +10,24 @@ Samples for which chloroplast genes are already extracted (skipping blastn to id
 
 ## Parameters
 
-Reference=References/cpDNA_RefCDS.fasta
-min_cov=50  Minimum coverage of a reference gene to keep a blast match
-min_gene_r=0.8 Quantile of sum of gene length (e.g. 0.8 means the minimum sum of gene length will be 20% of the top 20% percentile)
-min_len_r=0.2 minimum % of sum of gene length calculated with min_gene_r
-min_sample_r=0.5 minimum % of samples to keep a gene
-slurmThrottle=80 Number of parallel jobs run
+- Reference=References/cpDNA_RefCDS.fasta
+- min_cov=50  Minimum coverage of a reference gene to keep a blast match
+- min_gene_r=0.8 Quantile of sum of gene length (e.g. 0.8 means the 
+- minimum sum of gene length will be 20% of the top 20% percentile)
+- min_len_r=0.2 minimum % of sum of gene length calculated with 
+- min_gene_r
+- min_sample_r=0.5 minimum % of samples to keep a gene
+  slurmThrottle=80 Number of parallel jobs run
 
 ## Dependencies
 
 ```python
 - blastn
-- iqtree 2
-- trimAI
-- python3
+- iqtree/2.1.3
+- mafft/7.487
+- trimal/1.3
+- newick-utils 1.6 
+- python3.6
   - Pandas
   - Numpy
   - Bio
