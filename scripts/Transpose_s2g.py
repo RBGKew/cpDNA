@@ -133,7 +133,7 @@ for idx, row in genes_df.iterrows():
     seqid_ls = list(rec_df[rec_df.gene==row.gene].seqid)
     for seqid in seqid_ls:
         Records[seqid].id = Records[seqid].id.split('-')[0]
-        Records[seqid].description = ''
+        #Records[seqid].description = ''
         rec_gene.append(Records[seqid])
     SeqIO.write(rec_gene, params['out_dir'] + row.gene + '.fasta',format='fasta')
 
