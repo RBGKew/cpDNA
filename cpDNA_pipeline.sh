@@ -25,8 +25,7 @@ Label_file=$1 #cpTree0.1_labels.txt
 ### Parameters ### 
 Reference=References/cpDNA_RefCDS.fasta
 min_cov=50
-min_gene_r=0.8
-min_len_r=0.2
+min_len_r=0.1
 min_sample_r=0.5
 slurmThrottle=80
 
@@ -47,8 +46,8 @@ fi
 
 ### Concat and filter all samples ### 
 ## Add all genes from all samples in a single file
-mkdir -p $project; mkdir -p $project/Genes
-mkdir -p $project/Aligned_genes; mkdir -p $project/Aligned_genes_trimmed
+mkdir -p $project
+mkdir -p $project/Genes; mkdir -p $project/Aligned_genes; mkdir -p $project/Aligned_genes_trimmed
 cd $project
 > AllSamples_Allgenes.fasta
 while read iline; do
@@ -56,7 +55,7 @@ while read iline; do
 	cat ../CPgenes_by_sample/"$sample"_CPgenes.fasta >> AllSamples_Allgenes.fasta
 done < ../$Label_file
 
-python ../scripts/Transpose_s2g.py -f AllSamples_Allgenes.fasta --min_gene_r $min_gene_r --min_len_r $min_len_r --min_sample_r $min_sample_r --out_dir Genes/ --genes_kept_file ls_genes.txt --acc_genes
+python ../scripts/Transpose_s2g.py -f AllSamples_Allgenes.fasta --min_len_r $min_len_r --min_sample_r $min_sample_r --out_dir Genes/ --genes_kept_file ls_genes.txt --acc_genes
 
 ### Align and trim genes ### 
 Ngenes=$(wc -l ls_genes.txt | awk '{ print $1 }')
