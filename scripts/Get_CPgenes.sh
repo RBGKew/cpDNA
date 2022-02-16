@@ -24,3 +24,6 @@ blastn -query $Reference -db Data_clean/"$sample"_pt.fasta -outfmt "6 qseqid sse
 
 python scripts/targets_from_blast.py Blastn/"$sample"_CPgenes.blastn CPgenes_by_sample/"$sample"_CPgenes.fasta $min_cov
 
+rm Data_clean/"$sample"_pt.fasta.n*
+rm Data_clean/"$sample"_pt.fasta.s*
+

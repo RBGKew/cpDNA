@@ -3,7 +3,7 @@
 #SBATCH --job-name="cpDNA"
 #SBATCH --export=ALL
 #SBATCH --cpus-per-task=1
-#SBATCH --partition=short
+#SBATCH --partition=medium
 #SBATCH --ntasks=1
 #SBATCH --mem=8000
 ncpu=1
@@ -22,9 +22,9 @@ source activate phylo
 Label_file=$1 #cpTree0.1_labels.txt
 
 ### Parameters ### 
-min_gene_r=0
 min_len_r=0
 min_sample_r=0
+slurmThrottle=80
 
 ### Derived input ###
 project="ftp"
@@ -32,19 +32,27 @@ echo $project
 
 ### Concat all samples ### 
 ## Add all genes from all samples in a single file
-mkdir -p $project; mkdir -p $project/by_gene
+mkdir -p $project
+mkdir -p $project/Genes; mkdir -p $project/Aligned_genes; mkdir -p $project/Aligned_genes_trimmed
 mkdir -p $project/by_sample_contigs; mkdir -p $project/by_sample_genes;
 cd $project
 > AllSamples_Allgenes.fasta
 while read iline; do
 	sample="$(cut -d' ' -f1 <<<"$iline")"
 	label="$(cut -d' ' -f2 <<<"$iline")"
-	cp ../CPgenes_by_sample/"$sample"_CPgenes.fasta by_sample_genes/"$sample"-"$label"-genes.fasta
-	cp ../Data/"$sample"_pt.fasta by_sample_contigs/"$sample"-"$label"-contigs.fasta
+	cp ../CPgenes_by_sample/"$sample"_CPgenes.fasta by_sample_genes/"$sample"-genes.fasta
+	cp ../Data/"$sample"_pt.fasta by_sample_contigs/"$sample"-contigs.fasta
 	cat ../CPgenes_by_sample/"$sample"_CPgenes.fasta >> AllSamples_Allgenes.fasta
 done < ../$Label_file
 
-python ../scripts/Transpose_s2g.py -f AllSamples_Allgenes.fasta --min_gene_r $min_gene_r --min_len_r $min_len_r --min_sample_r $min_sample_r --out_dir by_gene/ --genes_kept_file ls_genes.txt
+python ../scripts/Transpose_s2g.py -f AllSamples_Allgenes.fasta --min_len_r $min_len_r --min_sample_r $min_sample_r --out_dir Genes/ --genes_kept_file ls_genes.txt
+
+### Align and trim genes ### 
+Ngenes=$(wc -l ls_genes.txt | awk '{ print $1 }')
+if (( $Ngenes > 0 )); then
+	sbatch --wait -p medium --array=1-${Ngenes}%$slurmThrottle ../scripts/Align_gene.sh ls_genes.txt
+fi
+
 
 
 

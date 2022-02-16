@@ -55,6 +55,7 @@ for id, record in Records.items():
 
 rec_df = pd.DataFrame.from_dict(rec_dc,orient='index').reset_index().rename(columns={'index':'seqid',0:'len'})
 rec_df[['Sample_Name','gene']] = rec_df.seqid.str.split('-',expand=True)
+rec_df.to_csv(params['filename'].replace('.fasta','_All_SeqTable.csv'),index=False)
 print('found',rec_df.shape[0],'sequences,',rec_df.Sample_Name.nunique(),'samples,',rec_df.gene.nunique(),'genes')
 
 
@@ -100,7 +101,7 @@ genes_pass = list(tmp[tmp.N>=min_sample].index)
 rec_df = rec_df[rec_df.gene.isin(genes_pass)]
 
 print('after filtering',rec_df.shape[0],'sequences,',rec_df.Sample_Name.nunique(),'samples,',rec_df.gene.nunique(),'genes')
-rec_df.to_csv(params['filename'].replace('.fasta','_SeqTable.csv'),index=False)
+rec_df.to_csv(params['filename'].replace('.fasta','_Sel_SeqTable.csv'),index=False)
 
 
 # In[26]:
