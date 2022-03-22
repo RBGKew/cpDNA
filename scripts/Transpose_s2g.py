@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[120]:
 
 
 import pandas as pd
@@ -9,18 +9,20 @@ from Bio import SeqIO
 import argparse
 
 
-# In[7]:
+# In[121]:
 
 
 # params = {}
-# params['filename'] = '../allgenes_allsamples.fasta'
-# params['min_len_r'] = 0.2; params['min_sample_r'] = 0.5; 
+# params['filename'] = '../AllSamples_Allgenes.fasta'
+# params['min_len_r'] = 0; params['min_sample_r'] = 0; 
 # params['out_dir'] = '../Genes/'
 # params['genes_kept_file'] = 'ls_genes_kept.txt'
 # params['acc_genes'] = True
+# params['rename'] = '../cpTree_v7/cpTree_v7_tree_DataDistribution.txt'
+# params['rename'] = False
 
 
-# In[4]:
+# In[122]:
 
 
 parser = argparse.ArgumentParser(description='Get genes from all samples')
@@ -29,17 +31,18 @@ parser.add_argument("--min_len_r", help="min_len_r", action="store", type=float,
 parser.add_argument("--min_sample_r", help="min_sample_r", action="store", type=float, default=0.5)
 parser.add_argument("--acc_genes", help="Keep only accepted genes (defined in script)", action="store_true", default=False)
 parser.add_argument("--out_dir", help="Output dir", action="store", default='Genes/')
+parser.add_argument("--rename", help="Rename Samples. 2nd column is new name, 3rd is label", action="store", default=False)
 parser.add_argument("--genes_kept_file", help="Output genes kept", action="store", default='ls_genes.txt')
 params = vars(parser.parse_args());
 
 
-# In[3]:
+# In[123]:
 
 
 print('Parameters:',params)
 
 
-# In[4]:
+# In[124]:
 
 
 # records
@@ -50,16 +53,31 @@ for id, record in Records.items():
     rec_dc[id] = len(record.seq)
 
 
-# In[5]:
+# In[125]:
 
 
 rec_df = pd.DataFrame.from_dict(rec_dc,orient='index').reset_index().rename(columns={'index':'seqid',0:'len'})
 rec_df[['Sample_Name','gene']] = rec_df.seqid.str.split('-',expand=True)
-rec_df.to_csv(params['filename'].replace('.fasta','_All_SeqTable.csv'),index=False)
 print('found',rec_df.shape[0],'sequences,',rec_df.Sample_Name.nunique(),'samples,',rec_df.gene.nunique(),'genes')
 
 
-# In[6]:
+# In[126]:
+
+
+if params['rename']!=False:
+    rename_df = pd.read_table(params['rename'],sep=' ',header=None)
+    rename_df.columns = ['Sample_Name','Public_Name','Label']
+    rec_df = pd.merge(rec_df,rename_df,how='left',on='Sample_Name')
+    print(rec_df.isna().sum().to_dict())
+
+
+# In[127]:
+
+
+rec_df.to_csv(params['filename'].replace('.fasta','_All_SeqTable.csv'),index=False)
+
+
+# In[128]:
 
 
 if params['acc_genes']==True:
@@ -73,18 +91,19 @@ if params['acc_genes']==True:
     print('>',rec_df.shape[0],'sequences,',rec_df.Sample_Name.nunique(),'samples,',rec_df.gene.nunique(),'genes')
 
 
-# In[17]:
+# In[129]:
 
 
 # Median Sum of gene length for good recoveries
 Stats_len = rec_df.groupby('Sample_Name').agg({'len':'sum','gene':'count'})#.to_frame()
-Stats_len_good = Stats_len[Stats_len.gene>=rec_df.gene.nunique()]
+print('Median gene count:',Stats_len.gene.median(),'Median sum of gene lengths:',Stats_len.len.median())
+Stats_len_good = Stats_len[Stats_len.gene>=rec_df.gene.nunique()*0.9]
 median_sumlen = Stats_len_good.len.median()
 print(round(Stats_len_good.shape[0]/Stats_len.shape[0]*100,0),'% of samples have',rec_df.gene.nunique(),
       'genes. Median Sum of genes length:',median_sumlen)
 
 
-# In[24]:
+# In[130]:
 
 
 # Filter by sum of contigs length
@@ -104,7 +123,7 @@ print('after filtering',rec_df.shape[0],'sequences,',rec_df.Sample_Name.nunique(
 rec_df.to_csv(params['filename'].replace('.fasta','_Sel_SeqTable.csv'),index=False)
 
 
-# In[26]:
+# In[131]:
 
 
 # Update gene list
@@ -112,15 +131,20 @@ genes_df = rec_df.groupby('gene').size().to_frame().reset_index()
 genes_df.gene.to_csv(params['genes_kept_file'],index=False,header=None)
 
 
-# In[28]:
+# In[132]:
 
 
 # Write output, gene by gene
 for idx, row in genes_df.iterrows():
     rec_gene = []
-    seqid_ls = list(rec_df[rec_df.gene==row.gene].seqid)
-    for seqid in seqid_ls:
-        Records[seqid].id = Records[seqid].id.split('-')[0]
-        rec_gene.append(Records[seqid])
+    rec_gene_df = rec_df[rec_df.gene==row.gene]
+    for idx, row in rec_gene_df.iterrows():
+        if params['rename']!=False:
+            Records[row.seqid].id = row.Public_Name
+            Records[row.seqid].description = row.Label + ' ' + Records[row.seqid].description
+        else:
+            Records[row.seqid].id = row.Sample_Name
+        Records[row.seqid].description = Records[row.seqid].description                                    .replace('reference_coverage','reference_overlap').replace('organism-gene','Reference_organism-gene')
+        rec_gene.append(Records[row.seqid])
     SeqIO.write(rec_gene, params['out_dir'] + row.gene + '.fasta',format='fasta')
 
