@@ -19,7 +19,7 @@
 # module load trimal/1.4.1
 # module load mafft/7.471
 ## JHI
-source activate phylo
+###source activate phylo	# Paul B. - changed to set env outside of this script
 
 ### Input ###
 Label_file=$1 #cpTree0.1_labels.txt
