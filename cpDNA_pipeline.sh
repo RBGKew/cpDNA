@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name="cpDNA"
+#SBATCH --job-name="cpDNA_pipeline"
 #SBATCH --export=ALL
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=medium
