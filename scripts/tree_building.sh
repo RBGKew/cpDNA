@@ -4,7 +4,7 @@
 #SBATCH --export=ALL
 #SBATCH --cpus-per-task=20
 #SBATCH --ntasks=1
-#SBATCH --mem=80000		### Paul B. - increased from 80GB to 120 GB
+#SBATCH --mem=120000		### Paul B. - increased from 80GB to 120 GB
 
 ## Kew
 # module load python/3.7.9
