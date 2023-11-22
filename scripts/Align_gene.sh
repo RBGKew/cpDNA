@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name="Get_CPgenes"
+#SBATCH --job-name="Align_CPgenes"
 #SBATCH --export=ALL
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks=1
