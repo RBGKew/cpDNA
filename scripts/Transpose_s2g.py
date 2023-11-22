@@ -144,7 +144,7 @@ for idx, row in genes_df.iterrows():
             Records[row.seqid].description = row.Label + ' ' + Records[row.seqid].description
         else:
             Records[row.seqid].id = row.Sample_Name
-        Records[row.seqid].description = Records[row.seqid].description                                    .replace('reference_coverage','reference_overlap').replace('organism-gene','Reference_organism-gene')
+        Records[row.seqid].description = Records[row.seqid].description.replace('reference_coverage','reference_overlap').replace('organism-gene','Reference_organism-gene')
         rec_gene.append(Records[row.seqid])
     SeqIO.write(rec_gene, params['out_dir'] + row.gene + '.fasta',format='fasta')
 
