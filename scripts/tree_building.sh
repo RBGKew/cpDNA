@@ -2,7 +2,7 @@
 
 #SBATCH --job-name="make_tree"
 #SBATCH --export=ALL
-#SBATCH --cpus-per-task=20
+#SBATCH --cpus-per-task=28 	### Paul B. - increased from 20 to 28	
 #SBATCH --ntasks=1
 #SBATCH --mem=120000		### Paul B. - increased from 80GB to 120 GB
 
