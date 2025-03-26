@@ -104,7 +104,8 @@ if [ $run_mode = "distrib" ]; then
 		Sample="$(cut -d' ' -f1 <<<"$iline")"
 		PublicName="$(cut -d' ' -f2 <<<"$iline")"
 		cp ../CPgenes_by_sample/"$Sample"_CPgenes.fasta Genes_By_Sample/"$PublicName"-pt_genes.fasta
-		cp ../Data/"$Sample"_pt.fasta Contigs/"$PublicName"-pt_contigs.fasta
+		### Paul B. - plastid assemblies are in Organelles/Data 
+		cp ../Organelles/Data/"$Sample"_pt.fasta Contigs/"$PublicName"-pt_contigs.fasta
 	done < ../$Label_file
 	### Copy low and high-threshold trees and alignments
 	mkdir -p Low_Thresold_Tree; mkdir -p High_Thresold_Tree;
